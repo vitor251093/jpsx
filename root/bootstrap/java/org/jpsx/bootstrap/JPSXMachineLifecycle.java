@@ -18,10 +18,13 @@
  */
 package org.jpsx.bootstrap;
 
+import org.jpsx.runtime.JPSXComponent;
 import org.jpsx.bootstrap.configuration.MachineDefinition;
 
 public interface JPSXMachineLifecycle {
     void initialize(MachineDefinition definition);
+
+    public List<JPSXComponent> getComponents();
 
     void start();
 

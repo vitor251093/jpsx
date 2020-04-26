@@ -77,6 +77,10 @@ public class JPSXMachineImpl implements JPSXMachine, JPSXMachineLifecycle {
         runInitializers();
     }
 
+    public List<JPSXComponent> getComponents() {
+        return components;
+    }
+
     public void start() {
         for (JPSXComponent component : components) {
             component.begin();

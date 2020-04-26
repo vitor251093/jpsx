@@ -52,7 +52,7 @@ public class LWJGLDisplay extends JPSXComponent implements Display, KeyListener 
     public static final String LOCATION_X_PROPERTY = "x";
     public static final String LOCATION_Y_PROPERTY = "y";
 
-    private Frame frame;
+    private Container container;
 
     // todo see if this is slower - we can fix GPU instead!
     private static final int SOURCE_FORMAT = GL_BGRA;
@@ -133,7 +133,7 @@ public class LWJGLDisplay extends JPSXComponent implements Display, KeyListener 
     public void initDisplay() {
 
         // todo, make a new initialization state for this
-        frame = new Frame("JPSX");
+        container = new Container();
 
         try {
             canvas = new AWTGLCanvas(new PixelFormat()) {
@@ -167,7 +167,7 @@ public class LWJGLDisplay extends JPSXComponent implements Display, KeyListener 
 
             };
 
-            frame.setLayout(new LayoutManager() {
+            container.setLayout(new LayoutManager() {
                 public void addLayoutComponent(String name, Component comp) {
                 }
 
@@ -194,7 +194,7 @@ public class LWJGLDisplay extends JPSXComponent implements Display, KeyListener 
                     }
                 }
             });
-            frame.add(canvas);
+            container.add(canvas);
             canvas.repaint();
         } catch (LWJGLException e) {
             throw new InvalidConfigurationException("Failed to initialize lwjgl", e);
@@ -204,26 +204,21 @@ public class LWJGLDisplay extends JPSXComponent implements Display, KeyListener 
         WritableRaster raster = model.createCompatibleWritableRaster(1024, 513);
         DataBufferInt db = (DataBufferInt) raster.getDataBuffer();
         ram = db.getData();
-        int w = getIntProperty(LOCATION_X_PROPERTY, -1);
-        int h = getIntProperty(LOCATION_Y_PROPERTY, -1);
-        if (w != -1 && h != -1) frame.setLocation(w, h);
-        frame.setResizable(false);
-        frame.show();
+
         sizeframe();
         canvas.addKeyListener(RuntimeConnections.KEY_LISTENERS.resolve());
-        frame.addWindowListener(new Closer());
-        frame.addComponentListener(new ComponentAdapter() {
+        container.addComponentListener(new ComponentAdapter() {
             public void componentResized(ComponentEvent e) {
-                frame.doLayout();
+                container.doLayout();
             }
         });
     }
 
     protected void sizeframe() {
         if (displayVRAM)
-            frame.setSize(new Dimension(1024 + frame.getInsets().left + frame.getInsets().right, 512 + frame.getInsets().top + frame.getInsets().bottom));
+            container.setSize(new Dimension(1024 + container.getInsets().left + container.getInsets().right, 512 + container.getInsets().top + container.getInsets().bottom));
         else
-            frame.setSize(new Dimension(xres[resindex] + frame.getInsets().left + frame.getInsets().right, yres[resindex] + frame.getInsets().top + frame.getInsets().bottom));
+            container.setSize(new Dimension(xres[resindex] + container.getInsets().left + container.getInsets().right, yres[resindex] + container.getInsets().top + container.getInsets().bottom));
     }
 
     // todo cache these
@@ -254,8 +249,8 @@ public class LWJGLDisplay extends JPSXComponent implements Display, KeyListener 
     private Object stateLock = new Object();
 
     protected void stretchBlit() {
-        int l = frame.getInsets().left;
-        int t = frame.getInsets().top;
+        int l = container.getInsets().left;
+        int t = container.getInsets().top;
         long timeBasis = 0;
         if (showBlitTime) {
             timeBasis = Timing.nanos();
@@ -328,7 +323,6 @@ public class LWJGLDisplay extends JPSXComponent implements Display, KeyListener 
                     refreshTimeTotal = refreshTimeCount = 0;
                 }
                 double blitTimeMSRounded = (blitTimeTotal/(BLIT_TIME_COUNT*100000))/10.0;
-                frame.setTitle("JPSX lwjgl - " + ((blitTimeMSRounded >= 1) ? "!SLOW! blit=" : "blit=") + blitTimeMSRounded + "ms" + refreshString);
                 blitTimeCount = 0;
                 blitTimeTotal = 0;
             }

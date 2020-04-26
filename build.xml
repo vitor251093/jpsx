@@ -2,7 +2,7 @@
 
 <project name="jpsx" default="default" basedir=".">
         <property file="build.properties"/>
-        <property name="src" value="${basedir}/src"/>
+        <property name="src" value="${basedir}/root"/>
         <property name="bootstrap.src" value="${src}/bootstrap/java"/>
         <property name="runtime.src" value="${src}/runtime/java"/>
         <property name="api.src" value="${src}/api/java"/>
