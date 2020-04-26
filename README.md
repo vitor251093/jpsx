@@ -24,7 +24,14 @@ should only really be needed on very slow machines, and breaks some code that us
 
 ## Building the Emulator
 
-JPSX is very simple to build. Just run `ant`, and it will build `jar` files in the `ship` folder.
+JPSX is very simple to build. Just run the commands below:
+
+```
+./docker-build.sh
+./get-build-from-docker.sh
+```
+
+It will build `jar` files in the `ship` folder.
 
 ## Running the Emulator
 
