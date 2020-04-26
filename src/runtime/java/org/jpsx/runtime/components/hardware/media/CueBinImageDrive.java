@@ -94,11 +94,29 @@ public class CueBinImageDrive extends SingletonJPSXComponent implements CDDrive 
         }
 
         private boolean parse(String cueFilename) {
-            LineNumberReader reader;
-            try {
-                reader = new LineNumberReader(new FileReader(cueFilename));
-            } catch (IOException e) {
-                log.warn("Unable to open CUE file " + cueFilename+": "+e.getMessage());
+            BufferedReader reader;
+            Boolean cueExistsAndWords = cueFilename.endsWith(".cue");
+            if (cueExistsAndWords) {
+                try {
+                    reader = new BufferedReader(new FileReader(cueFilename));
+                } catch (IOException e) {
+                    log.warn("Unable to open CUE file " + cueFilename+": "+e.getMessage());
+                    cueExistsAndWords = false;
+                }
+            }
+            
+            if (!cueExistsAndWords && cueFilename.endsWith(".bin")) {
+                int dot = cueFilename.lastIndexOf("/") != -1 ? cueFilename.lastIndexOf("/") : 
+                                                               cueFilename.lastIndexOf("\\");
+                String binFilename = cueFilename.substring(dot + 1);
+
+                dot = cueFilename.lastIndexOf(".");
+                if (dot >= 0) cueFilename = cueFilename.substring(0, dot) + ".cue";
+                String cueContents =  "FILE \"" + binFilename + "\" BINARY\n  TRACK 01 MODE2/2352\n  INDEX 01 00:00:00\n";
+                
+                reader = new BufferedReader(new StringReader(cueContents));
+            }
+            else {
                 return false;
             }
             String binFilename = cueFilename;
